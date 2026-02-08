@@ -1,45 +1,19 @@
 (function () {
-    console.log("%c Monkeytype Cheat Initiated (Human 100 WPM + Fixes) ", "background: #222; color: #bada55; font-size: 20px");
-
-    const keyMap = {
-        ' ': { code: 'Space', keyCode: 32 },
-        '\n': { code: 'Enter', keyCode: 13 },
-        '.': { code: 'Period', keyCode: 190 },
-        ',': { code: 'Comma', keyCode: 188 },
-        ';': { code: 'Semicolon', keyCode: 186 },
-        '\'': { code: 'Quote', keyCode: 222 },
-        '/': { code: 'Slash', keyCode: 191 },
-        '\\': { code: 'Backslash', keyCode: 220 },
-        '-': { code: 'Minus', keyCode: 189 },
-        '=': { code: 'Equal', keyCode: 187 },
-        '[': { code: 'BracketLeft', keyCode: 219 },
-        ']': { code: 'BracketRight', keyCode: 221 }
-    };
+    console.log("%c Monkeytype Cheat Initiated (Human 100 WPM) ", "background: #222; color: #bada55; font-size: 20px");
 
     function typeChar(char) {
         const target = document.activeElement || document.body;
-
-        // Determine properties
-        let key = char;
-        let code, keyCode;
-
-        if (keyMap[char]) {
-            code = keyMap[char].code;
-            keyCode = keyMap[char].keyCode;
-        } else {
-            // Fallback for letters/numbers
-            code = `Key${char.toUpperCase()}`;
-            keyCode = char.toUpperCase().charCodeAt(0);
-        }
-
+        const key = char;
+        const code = `Key${char.toUpperCase()}`;
         const eventOptions = {
             key: key,
             code: code,
-            keyCode: keyCode, // Important for legacy checks
-            which: keyCode,
+            charCode: char.charCodeAt(0),
+            keyCode: char.toUpperCase().charCodeAt(0),
+            which: char.toUpperCase().charCodeAt(0),
             bubbles: true,
             cancelable: true,
-            isTrusted: true // Ignored by browser but good for consistency
+            isTrusted: true
         };
 
         target.dispatchEvent(new KeyboardEvent('keydown', eventOptions));
@@ -56,9 +30,13 @@
         target.dispatchEvent(new KeyboardEvent('keyup', eventOptions));
     }
 
+    // Standard WPM: 1 word = 5 chars. 100 WPM = 500 CPM.
+    // 60000ms / 500 = 120ms per char.
+    // We add randomness to make it look human.
     function getDelay() {
-        // ~100 WPM
+        // Base delay for 100 WPM
         const baseDelay = 120;
+        // Random variance between -30ms and +30ms
         const variance = (Math.random() * 60) - 30;
         return baseDelay + variance;
     }
@@ -68,7 +46,7 @@
         const allWords = document.querySelectorAll('#words .word');
 
         if (!activeWord) {
-            console.error("Could not find active word. Is the test running?");
+            console.error("Could not find active word. Is the test started?");
             return;
         }
 
@@ -86,13 +64,12 @@
             }
         });
 
-        // The first char was typed by user.
-        // We trim it.
         const textToType = distinctText.substring(1);
-        console.log(`Typing ${textToType.length} characters...`);
+        console.log(`Typing ${textToType.length} characters at ~100 WPM...`);
 
         for (let i = 0; i < textToType.length; i++) {
             typeChar(textToType[i]);
+            // Wait for a human-like delay
             await new Promise(resolve => setTimeout(resolve, getDelay()));
         }
     }
@@ -105,13 +82,12 @@
 
             if (firstLetter && e.key === firstLetter) {
                 window.removeEventListener('keydown', triggerHandler);
-                // Increased delay to 150ms to prevent race condition with React state updates
-                console.log("Trigger detected. Starting in 150ms...");
-                setTimeout(cheat, 150);
+                setTimeout(cheat, 10);
             }
         }
     };
 
     window.addEventListener('keydown', triggerHandler);
-    console.log("READY: Type the first letter to start.");
+
+    console.log("READY: Type the first correct letter of the current word to start human-like typing.");
 })();
