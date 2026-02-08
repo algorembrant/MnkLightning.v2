@@ -5,7 +5,7 @@
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](#)
 [![Monkeytype](https://img.shields.io/badge/Target-Monkeytype-orange.svg)](https://monkeytype.com/)
 
-MnkLightning is a performance-oriented cheat-hack designed for Monkeytype. It implements sophisticated typing logic that mimics human-like latency and imperfectness to provide a natural typing flow.
+MonkeyLightning is a performance-oriented cheat-hack designed for Monkeytype. It implements sophisticated typing logic that mimics human-like latency and imperfectness to provide a natural typing flow.
 
 <img width="1358" height="648" alt="Interface Preview" src="https://github.com/user-attachments/assets/f42ba747-a9ca-4f2b-9244-cf60153eda99" />
 
