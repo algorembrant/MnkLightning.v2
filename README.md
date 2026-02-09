@@ -1,99 +1,70 @@
 # MnkLightning
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://www.python.org/)
 [![JavaScript](https://img.shields.io/badge/Language-JavaScript-F7DF1E.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![Version](https://img.shields.io/badge/Version-2.0.0-blue.svg)](#)
+[![Version](https://img.shields.io/badge/Version-3.0.0-red.svg)](#)
 [![Monkeytype](https://img.shields.io/badge/Target-Monkeytype-orange.svg)](https://monkeytype.com/)
 
-MonkeyLightning is a performance-oriented automation script designed for Monkeytype. It implements sophisticated human-like typing behavior with extensive imperfection modeling to provide a natural, undetectable typing flow.
-
-<img width="1358" height="648" alt="Interface Preview" src="https://github.com/user-attachments/assets/f42ba747-a9ca-4f2b-9244-cf60153eda99" />
-
-## Demonstration
-
-The following recording demonstrates the script in action, illustrating the variable typing speed and human-like errors.
-
-https://github.com/user-attachments/assets/ec3fa997-6859-400e-8672-d164c526ba7a
+MonkeyLightning is a performance-oriented automation script designed for Monkeytype. It implements sophisticated human-like typing behavior with real OS-level keyboard events to bypass bot detection.
 
 ## Technical Overview
 
-This repository contains `script_candidate.js`, featuring:
-- **Dynamic word fetching** - Continuously reads from DOM, works beyond 100 words
-- **Human-like latency modeling** with randomized inter-keystroke intervals
-- **12+ imperfection types** to emulate natural typing behavior
-- **QWERTY keyboard adjacency map** for realistic typos
-- **Fatigue simulation** that gradually slows typing over time
+This v3.0 release shifts from client-side JavaScript to **Python-based automation (PyAutoGUI)**. This creates "trusted" keyboard events that are indistinguishable from real human input to the browser.
 
-## Human-Like Imperfections
+- **`mnk_typer.py`**: Python script that simulates real keyboard input.
+- **`injector.js`**: Helper script to bridge text from browser to Python.
+- **Human-like Imperfections**: Full suite of 12+ imperfection types (typos, hesitations, fatigue).
 
-| Behavior | Default Rate | Description |
-|----------|--------------|-------------|
-| **Wrong Character** | 2.5% | Types a random letter instead of correct one |
-| **Adjacent Key Typo** | 2% | Hits a nearby key on QWERTY keyboard (e.g., 'd' → 's') |
-| **Double Letter** | 1.5% | Accidentally presses a key twice |
-| **Triple Letter** | 0.3% | Accidentally presses a key three times |
-| **Skip Letter** | 1% | Finger moves too fast, misses a key |
-| **Transposed Letters** | 1.2% | Swaps two adjacent letters (e.g., "teh" → "the") |
-| **Ctrl+Backspace** | 0.8% | Deletes whole word when frustrated with errors |
-| **Hesitation Pause** | 4% | Random thinking pause (3.5x longer delay) |
-| **Burst Typing** | 8% | Fast typing burst for 5 characters |
-| **Word Start Slowdown** | Always | First letter of each word typed 1.8x slower |
-| **Fatigue** | Gradual | Typing slowly gets slower over time |
-| **Post-Mistake Pause** | After errors | 2x longer delay after making a mistake |
+## Usage Instructions (Bypass Method)
 
-## Usage Instructions
+The new bypass method uses a 2-step process:
 
-1. Navigate to [Monkeytype](https://monkeytype.com/).
-2. Open the browser's developer console (`F12` or `Ctrl+Shift+J`).
-3. Copy the contents of [script_candidate.js](./script_candidate.js) and paste into the console.
-4. Press Enter to execute.
-5. Start a typing test — the automation triggers when you type the first character.
+### Step 1: Setup
+
+1. Install Python (if not installed).
+2. Install required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Step 2: Run the Bot
+
+1. **Open Monkeytype** in your browser.
+2. **Open Developer Console** (`F12` or `Ctrl+Shift+J`).
+3. **Paste & Run** the contents of [`injector.js`](./injector.js) into the console.
+   - You should see a message: "MnkLightning Injector Active".
+4. **Run the Python script** in a terminal:
+   ```bash
+   python mnk_typer.py
+   ```
+5. **Trigger the Bot**:
+   - Focus the Monkeytype window.
+   - Press **`Insert`** key to copy current words to clipboard.
+   - Press **`Insert`** key again to START typing.
+   - Press **`Esc`** to stop at any time.
 
 ## Configuration
 
-Customize the bot by modifying the `CONFIG` object in `script_candidate.js`:
+You can customize the bot's behavior in `mnk_typer.py`:
 
-```javascript
-const CONFIG = {
-    minWPM: 310,              // Minimum expected WPM
-    maxWPM: 550,              // Maximum expected WPM
-    startDelay: 50,           // Delay before starting to type
-
-    // === HUMAN IMPERFECTION RATES ===
-    wrongCharRate: 0.025,     // Random wrong character
-    adjacentKeyRate: 0.02,    // Nearby key on keyboard
-    doubleLetterRate: 0.015,  // Double key press
-    tripleLetterRate: 0.003,  // Triple key press
-    skipLetterRate: 0.01,     // Missed key
-    transposeRate: 0.012,     // Swapped adjacent letters
-    ctrlBackspaceRate: 0.008, // Delete whole word
-    hesitationRate: 0.04,     // Random pause
-    hesitationMultiplier: 3.5,
-    burstTypingRate: 0.08,    // Fast burst mode
-    burstSpeedMultiplier: 0.5,
-    burstLength: 5,
-    wordStartSlowdown: 1.8,   // Slower first letter
-    fatigueEnabled: true,
-    fatigueRate: 0.0001,
-    postMistakePauseMultiplier: 2.0,
-};
+```python
+CONFIG = {
+    "min_wpm": 310,
+    "max_wpm": 550,
+    
+    # Imperfections (0.0 - 1.0)
+    "wrong_char_rate": 0.025,
+    "adjacent_key_rate": 0.02,
+    "hesitation_rate": 0.04,
+    "burst_rate": 0.08,
+    
+    # Timing
+    "hesitation_multiplier": 3.5,
+    "burst_speed_multiplier": 0.5,
+}
 ```
-
-Set any rate to `0` to disable that imperfection type.
 
 ## Disclaimer
 
 This software is provided for educational and research purposes only. The authors do not encourage or condone the use of automation scripts on competitive platforms. Use at your own risk.
-
-## Citation
-
-```bibtex
-@software{MnkLightning2026,
-  author = {algorembrant},
-  title = {MnkLightning: Human-Like Typing Automation for Monkeytype},
-  year = {2026},
-  publisher = {GitHub},
-  journal = {GitHub Repository},
-  howpublished = {\url{https://github.com/algorembrant/MnkLightning}}
-}
-```

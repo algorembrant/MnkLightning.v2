@@ -1,1 +1,7 @@
 WARNING.md
+.venv
+.env
+.vscode/
+.gemini/
+__pycache__/
+*.pyc
