@@ -5,3 +5,4 @@ WARNING.md
 .gemini/
 __pycache__/
 *.pyc
+.warning    
