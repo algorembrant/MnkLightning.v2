@@ -13,7 +13,7 @@
         max_key_hold: 0.04,
 
         // Imperfection Rates (0.0 to 1.0)
-        wrong_char_rate: 0.005, // reduced for stability
+        wrong_char_rate: 0.005,
         adjacent_key_rate: 0.005,
         double_letter_rate: 0.001,
         skip_letter_rate: 0.001,
@@ -75,21 +75,71 @@
 
     // === INPUT SIMULATION ===
 
+    const CODE_MAP = {
+        ' ': 'Space',
+        'Enter': 'Enter',
+        'Backspace': 'Backspace',
+        'Escape': 'Escape',
+        ',': 'Comma',
+        '.': 'Period',
+        '/': 'Slash',
+        ';': 'Semicolon',
+        "'": 'Quote',
+        '[': 'BracketLeft',
+        ']': 'BracketRight',
+        '\\': 'Backslash',
+        '-': 'Minus',
+        '=': 'Equal',
+        '`': 'Backquote',
+        '1': 'Digit1', '2': 'Digit2', '3': 'Digit3', '4': 'Digit4', '5': 'Digit5',
+        '6': 'Digit6', '7': 'Digit7', '8': 'Digit8', '9': 'Digit9', '0': 'Digit0'
+    };
+
     function dispatchKey(key, type) {
         let code;
-        if (key === ' ') code = 'Space';
-        else if (key === 'Backspace') code = 'Backspace';
-        else if (key.length === 1 && /[a-zA-Z]/.test(key)) code = `Key${key.toUpperCase()}`;
-        else code = key; // Fallback logic
+
+        // 1. Check strict map
+        if (CODE_MAP[key]) {
+            code = CODE_MAP[key];
+        }
+        // 2. Letters
+        else if (key.length === 1 && /[a-zA-Z]/.test(key)) {
+            code = `Key${key.toUpperCase()}`;
+        }
+        // 3. Fallback for shifted punctuation
+        else if (key === '!') code = 'Digit1';
+        else if (key === '@') code = 'Digit2';
+        else if (key === '#') code = 'Digit3';
+        else if (key === '$') code = 'Digit4';
+        else if (key === '%') code = 'Digit5';
+        else if (key === '^') code = 'Digit6';
+        else if (key === '&') code = 'Digit7';
+        else if (key === '*') code = 'Digit8';
+        else if (key === '(') code = 'Digit9';
+        else if (key === ')') code = 'Digit0';
+        else if (key === '_') code = 'Minus';
+        else if (key === '+') code = 'Equal';
+        else if (key === '{') code = 'BracketLeft';
+        else if (key === '}') code = 'BracketRight';
+        else if (key === '|') code = 'Backslash';
+        else if (key === ':') code = 'Semicolon';
+        else if (key === '"') code = 'Quote';
+        else if (key === '<') code = 'Comma';
+        else if (key === '>') code = 'Period';
+        else if (key === '?') code = 'Slash';
+        else if (key === '~') code = 'Backquote';
+        else {
+            code = key;
+        }
 
         const event = new KeyboardEvent(type, {
             key: key,
             code: code,
-            bubbles: true, // Important for React/Frameworks
+            bubbles: true,
             cancelable: true,
             view: window,
-            which: key.charCodeAt(0), // Legacy support
-            keyCode: key.charCodeAt(0) // Legacy
+            which: key.charCodeAt(0),
+            keyCode: key.charCodeAt(0)
         });
 
         const target = document.activeElement || document.body;
@@ -117,8 +167,6 @@
     // === CORE LOGIC ===
 
     function getVisibleText() {
-        // Try standard Monkeytype structure
-        // <div class="word active"><letter>h</letter>...</div>
         const words = document.querySelectorAll('.word');
         if (words.length === 0) return null;
 
@@ -141,10 +189,15 @@
             return;
         }
 
+        // Try to focus the game area if possible
+        const gameWords = document.getElementById('words');
+        if (gameWords) {
+            gameWords.click(); // Hack to ensure focus
+        }
+
         isTyping = true;
         abortTyping = false;
 
-        // Use user configured WPM range or default
         const wpm = randomInt(CONFIG.min_wpm, CONFIG.max_wpm);
         console.log(`MnkLightning: Starting... Target WPM: ${wpm}, Length: ${text.length}`);
 
@@ -160,7 +213,7 @@
 
                 if (burstRemaining > 0) burstRemaining--;
 
-                // === IMPERFECTIONS (Ported Logic) ===
+                // === IMPERFECTIONS ===
 
                 if (Math.random() < CONFIG.hesitation_rate) {
                     delay *= CONFIG.hesitation_multiplier;
@@ -221,7 +274,6 @@
             startTyping();
         }
         if (e.key === 'Escape') {
-            // Abort if running
             abortTyping = true;
             if (isTyping) {
                 console.log("MnkLightning: Aborting...");
